@@ -15,10 +15,14 @@ export const sendMessageToAI = async (messages) => {
     }
 
     try {
+        // Limitar el historial a las últimas 10 interacciones (20 mensajes: 10 usuario + 10 asistente)
+        // Esto previene consumo excesivo de tokens y bloqueos de API
+        const recentMessages = messages.slice(-20);
+        
         const response = await axios.post(
             OPENROUTER_URL,
             {
-                model: 'google/gemini-2.0-flash-001', // Usando Gemini 2.0 Flash como se pidió
+                model: 'google/gemini-2.0-flash-001',
                 messages: [
                     {
                         role: 'system',
@@ -31,8 +35,9 @@ export const sendMessageToAI = async (messages) => {
             Cuando un usuario pida una cita, asegúrate de obtener: Nombre, Zona de interés y un medio de contacto (WhatsApp o Correo).
             Habla siempre en español con elegancia.`
                     },
-                    ...messages
+                    ...recentMessages
                 ],
+                max_tokens: 300, // Limitar respuestas a ~300 tokens para mantener concisión
             },
             {
                 headers: {
