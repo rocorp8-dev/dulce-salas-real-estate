@@ -27,9 +27,10 @@ const LandingPage = () => (
         {/* Background image with overlay for that "lost" depth */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+            src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=50"
             className="w-full h-full object-cover opacity-30 grayscale"
             alt=""
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505] pointer-events-none" />
           <div className="absolute inset-0 bg-black/60 pointer-events-none" />

@@ -8,9 +8,10 @@ const Hero = () => {
             {/* Background with higher resolution feel */}
             <div className="absolute inset-0 z-0">
                 <img
-                    src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                    src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=60"
                     className="w-full h-full object-cover"
                     alt="Luxury Real Estate"
+                    loading="eager"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90 pointer-events-none" />
             </div>
