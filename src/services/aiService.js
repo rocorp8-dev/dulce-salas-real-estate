@@ -37,7 +37,7 @@ export const sendMessageToAI = async (messages) => {
             {
                 headers: {
                     'Authorization': `Bearer ${apiKey}`,
-                    'HTTP-Referer': 'http://localhost:5173', // Para OpenRouter rankings
+                    'HTTP-Referer': window.location.origin || 'https://enchanting-kleicha-4fccf9.netlify.app',
                     'X-Title': 'Dulce Salas Real Estate App',
                     'Content-Type': 'application/json',
                 },
