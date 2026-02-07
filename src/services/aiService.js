@@ -1,8 +1,5 @@
 import axios from 'axios';
 
-// Nota: El usuario debe proporcionar la API Key en un archivo .env
-// OPENROUTER_API_KEY=your_key_here
-
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 export const sendMessageToAI = async (messages) => {
@@ -15,10 +12,10 @@ export const sendMessageToAI = async (messages) => {
     }
 
     try {
-        // Limitar el historial a las últimas 10 interacciones (20 mensajes: 10 usuario + 10 asistente)
+        // Limitar el historial a las últimas 6 interacciones (12 mensajes)
         // Esto previene consumo excesivo de tokens y bloqueos de API
-        const recentMessages = messages.slice(-20);
-        
+        const recentMessages = messages.slice(-12);
+
         const response = await axios.post(
             OPENROUTER_URL,
             {
@@ -27,17 +24,22 @@ export const sendMessageToAI = async (messages) => {
                     {
                         role: 'system',
                         content: `Eres el asistente inmobiliario inteligente de Dulce Salas en Baja California Norte. 
-            Tu tono es profesional, visionario, servicial y experto.
-            Conoces a fondo el mercado de Tijuana, Rosarito, Ensenada (Valle de Guadalupe) y Tecate.
-            REGLA CRÍTICA: Sé extremadamente conciso. Haz una sola pregunta clara a la vez para guiar la conversación de forma natural. 
-            No abrumes con párrafos largos ni múltiples preguntas.
-            Tu objetivo principal es ayudar al usuario y, si detectas interés serio, proponer una cita. 
-            Cuando un usuario pida una cita, asegúrate de obtener: Nombre, Zona de interés y un medio de contacto (WhatsApp o Correo).
-            Habla siempre en español con elegancia.`
+Tu tono es profesional, visionario, servicial y experto.
+Conoces a fondo el mercado de Tijuana, Rosarito, Ensenada (Valle de Guadalupe) y Tecate.
+
+REGLAS CRÍTICAS:
+1. Sé EXTREMADAMENTE CONCISO. Máximo 2-3 oraciones por respuesta.
+2. Haz UNA SOLA pregunta clara a la vez.
+3. No abrumes con párrafos largos ni múltiples preguntas.
+
+Tu objetivo principal es ayudar al usuario y, si detectas interés serio, proponer una cita.
+Cuando un usuario pida una cita, asegúrate de obtener: Nombre, Zona de interés y un medio de contacto (WhatsApp o Correo).
+Habla siempre en español con elegancia.`
                     },
                     ...recentMessages
                 ],
-                max_tokens: 300, // Limitar respuestas a ~300 tokens para mantener concisión
+                max_tokens: 200,
+                temperature: 0.7,
             },
             {
                 headers: {
@@ -52,6 +54,16 @@ export const sendMessageToAI = async (messages) => {
         return response.data.choices[0].message;
     } catch (error) {
         console.error('Error calling OpenRouter:', error);
+
+        // Manejo específico de errores de rate limiting
+        if (error.response?.status === 429) {
+            return {
+                role: 'assistant',
+                content: 'Estoy recibiendo muchas consultas en este momento. Por favor, espera unos segundos e intenta de nuevo.',
+                isError: true
+            };
+        }
+
         throw error;
     }
 };

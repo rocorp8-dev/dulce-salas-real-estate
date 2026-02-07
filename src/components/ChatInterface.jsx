@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Bot, User, Sparkles, MapPin, Calculator, FileText, X } from 'lucide-react'
-import { sendMessageToAI } from '../services/aiService'
+import { Send, Bot, User, Sparkles, MapPin, Calculator, FileText, X, Copy, Check } from 'lucide-react'
+import { sendMessageToAI, detectCommand, generateQuote, generateWhatsApp, listAllServices } from '../services/aiService'
 import { sendLeadNotification } from '../services/emailService'
 
 const ChatInterface = () => {
@@ -9,11 +9,12 @@ const ChatInterface = () => {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
-            content: 'Hola, un gusto saludarte. Soy el asistente inteligente de Dulce Salas. ¿En qué zona de Baja California estás buscando tu próxima inversión? Ensenada, Rosarito o Tijuana...'
+            content: 'Hola, soy tu IA Concierge de D9 Marketing. ¿En qué puedo ayudarte hoy? 😊\n\nPuedo ayudarte con:\n• Información de servicios y precios\n• Generar presupuestos personalizados\n• Crear mensajes para WhatsApp\n• Gestionar tu agenda'
         }
     ])
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [copiedIndex, setCopiedIndex] = useState(null)
     const messagesEndRef = useRef(null)
 
     const scrollToBottom = () => {
@@ -35,10 +36,51 @@ const ChatInterface = () => {
 
         const userMessage = { role: 'user', content: input }
         setMessages(prev => [...prev, userMessage])
+        const currentInput = input
         setInput('')
         setIsLoading(true)
 
         try {
+            // Detectar si es un comando especial
+            const command = detectCommand(currentInput)
+
+            if (command) {
+                // Procesar comando sin enviar a la IA
+                let response = ''
+
+                if (command.type === 'quote') {
+                    // Generar presupuesto
+                    response = generateQuote(command.serviceId, command.clientName)
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: response,
+                        isQuote: true
+                    }])
+                } else if (command.type === 'whatsapp') {
+                    // Generar mensaje de WhatsApp
+                    response = generateWhatsApp(command.templateType, command.clientName)
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: response,
+                        isWhatsApp: true
+                    }])
+                } else if (command.type === 'services') {
+                    // Listar servicios
+                    const services = listAllServices()
+                    response = '*SERVICIOS DISPONIBLES:*\n\n' + services.map(s =>
+                        `*${s.name}*\n${s.description}\n💰 ${s.price}\n`
+                    ).join('\n')
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: response
+                    }])
+                }
+
+                setIsLoading(false)
+                return
+            }
+
+            // Si no es comando, enviar a la IA normalmente
             const chatHistory = messages.concat(userMessage)
             const assistantResponse = await sendMessageToAI(chatHistory)
 
@@ -53,24 +95,19 @@ const ChatInterface = () => {
 
                 // Lógica de detección de lead/cita
                 const content = assistantResponse.content.toLowerCase()
-                console.log("Analizando respuesta de IA para envío de correo:", content);
-
-                // Palabras clave ampliadas para detección
                 const keywords = ["agendada", "correo enviado", "confirmada", "cita", "contactaré", "datos recibidos", "perfecto", "registrado"];
                 const isLeadCapture = keywords.some(keyword => content.includes(keyword));
 
                 if (isLeadCapture) {
-                    console.log("¡Intención de cita detectada! Preparando envío de correo...");
                     const leadData = {
                         name: "Cliente desde Chat",
-                        context: `Conversación reciente: ${input} ... (Respuesta IA: ${assistantResponse.content})`,
+                        context: `Conversación reciente: ${currentInput} ... (Respuesta IA: ${assistantResponse.content})`,
                         contact: "Verificar historial de chat",
                         date: new Date().toLocaleString()
                     }
 
                     try {
-                        const emailResult = await sendLeadNotification(leadData)
-                        console.log("Resultado del envío de correo:", emailResult);
+                        await sendLeadNotification(leadData)
                     } catch (emailErr) {
                         console.error("Fallo al intentar enviar el correo automático:", emailErr);
                     }
@@ -79,11 +116,21 @@ const ChatInterface = () => {
         } catch (error) {
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: 'Lo siento, hubo un problema al conectar con mis sistemas centrales de IA. Por favor, verifica tu conexión o API Key.',
+                content: 'Lo siento, hubo un problema al conectar con mis sistemas. Por favor, verifica tu conexión.',
                 isError: true
             }])
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const copyToClipboard = async (text, index) => {
+        try {
+            await navigator.clipboard.writeText(text)
+            setCopiedIndex(index)
+            setTimeout(() => setCopiedIndex(null), 2000)
+        } catch (err) {
+            console.error('Error al copiar:', err)
         }
     }
 
@@ -108,14 +155,14 @@ const ChatInterface = () => {
                         {/* Header */}
                         <div className="p-6 bg-white/5 border-b border-white/5 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-[#d4af37] overflow-hidden border border-[#d4af37]/30">
-                                    <img src="/dulce_perfil.png" className="w-full h-full object-cover" alt="Dulce Salas" />
+                                <div className="w-10 h-10 rounded-full bg-[#d4af37] flex items-center justify-center border border-[#d4af37]/30">
+                                    <Bot className="w-6 h-6 text-black" />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-black uppercase tracking-widest text-white">Dulce Salas AI</h3>
+                                    <h3 className="text-sm font-black uppercase tracking-widest text-white">IA Concierge</h3>
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[10px] text-zinc-500 font-bold uppercase">En línea</span>
+                                        <span className="text-[10px] text-zinc-500 font-bold uppercase">D9 Marketing</span>
                                     </div>
                                 </div>
                             </div>
@@ -131,11 +178,35 @@ const ChatInterface = () => {
                         <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
                             {messages.map((msg, index) => (
                                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[85%] px-5 py-3.5 rounded-2xl text-[14px] leading-relaxed ${msg.role === 'user'
-                                        ? 'bg-[#d4af37] text-black font-semibold rounded-tr-none shadow-lg'
-                                        : 'bg-white/5 border border-white/10 text-white rounded-tl-none'
+                                    <div className={`max-w-[85%] ${msg.role === 'user'
+                                        ? 'bg-[#d4af37] text-black font-semibold rounded-2xl rounded-tr-none shadow-lg'
+                                        : 'bg-white/5 border border-white/10 text-white rounded-2xl rounded-tl-none'
                                         }`}>
-                                        {msg.content}
+                                        <div className="px-5 py-3.5 text-[14px] leading-relaxed whitespace-pre-wrap">
+                                            {msg.content}
+                                        </div>
+
+                                        {/* Botón de copiar para presupuestos y mensajes de WhatsApp */}
+                                        {(msg.isQuote || msg.isWhatsApp) && msg.role === 'assistant' && (
+                                            <div className="px-5 pb-3.5 pt-0">
+                                                <button
+                                                    onClick={() => copyToClipboard(msg.content, index)}
+                                                    className="flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-black rounded-lg hover:bg-[#d4af37]/90 transition-all text-xs font-bold"
+                                                >
+                                                    {copiedIndex === index ? (
+                                                        <>
+                                                            <Check size={14} />
+                                                            ¡Copiado!
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Copy size={14} />
+                                                            {msg.isWhatsApp ? 'Copiar para WhatsApp' : 'Copiar Presupuesto'}
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))}
@@ -151,6 +222,33 @@ const ChatInterface = () => {
                                 </div>
                             )}
                             <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Quick Action Buttons */}
+                        <div className="px-6 py-3 border-t border-white/5 bg-black/20">
+                            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                                <button
+                                    onClick={() => setInput('/servicios')}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
+                                >
+                                    <FileText size={14} />
+                                    Ver Servicios
+                                </button>
+                                <button
+                                    onClick={() => setInput('/presupuesto metaAds ')}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
+                                >
+                                    <Calculator size={14} />
+                                    Generar Presupuesto
+                                </button>
+                                <button
+                                    onClick={() => setInput('/whatsapp followUpQuote ')}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
+                                >
+                                    <Sparkles size={14} />
+                                    Mensaje WhatsApp
+                                </button>
+                            </div>
                         </div>
 
                         {/* Input Area */}
