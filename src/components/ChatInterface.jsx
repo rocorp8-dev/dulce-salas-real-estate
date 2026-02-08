@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Bot, User, Sparkles, MapPin, Calculator, FileText, X, Copy, Check } from 'lucide-react'
-import { sendMessageToAI, detectCommand, generateQuote, generateWhatsApp, listAllServices } from '../services/aiService'
+import { sendMessageToAI } from '../services/aiService'
 import { sendLeadNotification } from '../services/emailService'
 
 const ChatInterface = () => {
@@ -9,7 +9,7 @@ const ChatInterface = () => {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
-            content: 'Hola, soy tu IA Concierge de D9 Marketing. ¿En qué puedo ayudarte hoy? 😊\n\nPuedo ayudarte con:\n• Información de servicios y precios\n• Generar presupuestos personalizados\n• Crear mensajes para WhatsApp\n• Gestionar tu agenda'
+            content: 'Hola, soy tu asistente inmobiliaria de Dulce Salas. ¿En qué puedo ayudarte hoy? 😊\n\nPuedo ayudarte con:\n• Información de propiedades exclusivas\n• Agendar una cita o consultoría\n• Conocer el mercado en Baja California\n• Dudas sobre procesos de compra/venta'
         }
     ])
     const [input, setInput] = useState('')
@@ -41,46 +41,7 @@ const ChatInterface = () => {
         setIsLoading(true)
 
         try {
-            // Detectar si es un comando especial
-            const command = detectCommand(currentInput)
-
-            if (command) {
-                // Procesar comando sin enviar a la IA
-                let response = ''
-
-                if (command.type === 'quote') {
-                    // Generar presupuesto
-                    response = generateQuote(command.serviceId, command.clientName)
-                    setMessages(prev => [...prev, {
-                        role: 'assistant',
-                        content: response,
-                        isQuote: true
-                    }])
-                } else if (command.type === 'whatsapp') {
-                    // Generar mensaje de WhatsApp
-                    response = generateWhatsApp(command.templateType, command.clientName)
-                    setMessages(prev => [...prev, {
-                        role: 'assistant',
-                        content: response,
-                        isWhatsApp: true
-                    }])
-                } else if (command.type === 'services') {
-                    // Listar servicios
-                    const services = listAllServices()
-                    response = '*SERVICIOS DISPONIBLES:*\n\n' + services.map(s =>
-                        `*${s.name}*\n${s.description}\n💰 ${s.price}\n`
-                    ).join('\n')
-                    setMessages(prev => [...prev, {
-                        role: 'assistant',
-                        content: response
-                    }])
-                }
-
-                setIsLoading(false)
-                return
-            }
-
-            // Si no es comando, enviar a la IA normalmente
+            // Enviar a la IA normalmente
             const chatHistory = messages.concat(userMessage)
             const assistantResponse = await sendMessageToAI(chatHistory)
 
@@ -159,10 +120,10 @@ const ChatInterface = () => {
                                     <Bot className="w-6 h-6 text-black" />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-black uppercase tracking-widest text-white">IA Concierge</h3>
+                                    <h3 className="text-sm font-black uppercase tracking-widest text-white">Asistente Virtual</h3>
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[10px] text-zinc-500 font-bold uppercase">D9 Marketing</span>
+                                        <span className="text-[10px] text-zinc-500 font-bold uppercase">Dulce Salas Real Estate</span>
                                     </div>
                                 </div>
                             </div>
@@ -228,25 +189,25 @@ const ChatInterface = () => {
                         <div className="px-6 py-3 border-t border-white/5 bg-black/20">
                             <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                                 <button
-                                    onClick={() => setInput('/servicios')}
+                                    onClick={() => setInput('¿Qué propiedades tienes disponibles?')}
                                     className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
                                 >
                                     <FileText size={14} />
-                                    Ver Servicios
+                                    Ver Propiedades
                                 </button>
                                 <button
-                                    onClick={() => setInput('/presupuesto metaAds ')}
+                                    onClick={() => setInput('Quiero agendar una cita')}
                                     className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
                                 >
                                     <Calculator size={14} />
-                                    Generar Presupuesto
+                                    Agendar Cita
                                 </button>
                                 <button
-                                    onClick={() => setInput('/whatsapp followUpQuote ')}
+                                    onClick={() => setInput('Inversiones en Baja California')}
                                     className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
                                 >
                                     <Sparkles size={14} />
-                                    Mensaje WhatsApp
+                                    Inversiones BC
                                 </button>
                             </div>
                         </div>
