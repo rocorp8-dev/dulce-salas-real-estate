@@ -62,7 +62,7 @@ const LandingPage = () => (
             onClick={() => window.dispatchEvent(new CustomEvent('openChat'))}
             className="bg-[#d4af37] text-black px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white hover:scale-105 transition-all shadow-2xl shadow-[#d4af3720]"
           >
-            AGENDAR CONSULTORÍA GRATUITA
+            AGENDAR UNA CITA
           </button>
 
           {/* Social Media Icons */}

@@ -189,13 +189,6 @@ const ChatInterface = () => {
                         <div className="px-6 py-3 border-t border-white/5 bg-black/20">
                             <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                                 <button
-                                    onClick={() => setInput('¿Qué propiedades tienes disponibles?')}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
-                                >
-                                    <FileText size={14} />
-                                    Ver Propiedades
-                                </button>
-                                <button
                                     onClick={() => setInput('Quiero agendar una cita')}
                                     className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
                                 >
@@ -203,11 +196,11 @@ const ChatInterface = () => {
                                     Agendar Cita
                                 </button>
                                 <button
-                                    onClick={() => setInput('Inversiones en Baja California')}
+                                    onClick={() => setInput('¿Qué propiedades tienes disponibles?')}
                                     className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold whitespace-nowrap transition-all"
                                 >
-                                    <Sparkles size={14} />
-                                    Inversiones BC
+                                    <FileText size={14} />
+                                    Ver Propiedades
                                 </button>
                             </div>
                         </div>
