@@ -75,9 +75,11 @@ const ChatInterface = () => {
                 }
             }
         } catch (error) {
+            console.error("Error completo:", error);
+            const detail = error.response?.data?.error?.message || error.message || 'Error desconocido';
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: 'Lo siento, hubo un problema al conectar con mis sistemas. Por favor, verifica tu conexión.',
+                content: `Lo siento, hubo un problema al conectar: "${detail}". Por favor, verifica que la API Key en el panel de Vercel sea la correcta.`,
                 isError: true
             }])
         } finally {

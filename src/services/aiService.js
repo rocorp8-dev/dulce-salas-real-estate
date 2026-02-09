@@ -86,17 +86,17 @@ Habla siempre en español con elegancia.`
                         },
                         ...recentMessages
                     ],
-                    max_tokens: 400,
+                    max_tokens: 500,
                     temperature: 0.7,
                 },
                 {
                     headers: {
                         'Authorization': `Bearer ${apiKey}`,
-                        'HTTP-Referer': window.location.origin || 'https://enchanting-kleicha-4fccf9.netlify.app',
+                        'HTTP-Referer': window.location.origin || 'https://dulce-salas-real-estate-obj5.vercel.app',
                         'X-Title': 'Dulce Salas Real Estate App',
                         'Content-Type': 'application/json',
                     },
-                    timeout: 15000 // 15 segundos de timeout
+                    timeout: 20000 // 20 segundos de timeout
                 }
             );
 
