@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MapPin, Info, X, CheckCircle2, MessageSquare, AlertCircle } from 'lucide-react'
+import { MapPin, Info, X, CheckCircle2, AlertCircle, Building2 } from 'lucide-react'
 import { supabase } from '../services/supabaseClient'
 import PropertyCollage from './PropertyCollage'
 
@@ -35,6 +36,18 @@ const PropertyExplorer = () => {
     useEffect(() => {
         fetchProperties()
     }, [])
+
+    // 🔒 Lock body scroll when modal is open
+    useEffect(() => {
+        if (selectedProperty) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = ''
+        }
+        return () => {
+            document.body.style.overflow = ''
+        }
+    }, [selectedProperty])
 
     const fetchProperties = async () => {
         try {
@@ -162,34 +175,36 @@ const PropertyExplorer = () => {
                 )}
             </div>
 
-            {/* Detail Overlay */}
+            {/* Detail Overlay — rendered in a Portal to avoid scroll-context issues */}
             <AnimatePresence>
-                {selectedProperty && (
+                {selectedProperty && createPortal(
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 backdrop-blur-3xl bg-black/60"
+                        onClick={() => setSelectedProperty(null)}
+                        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 backdrop-blur-3xl bg-black/60"
                     >
                         <motion.div
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white w-full max-w-5xl max-h-[90vh] rounded-[3rem] overflow-hidden flex flex-col md:flex-row shadow-2xl relative"
+                            onClick={e => e.stopPropagation()}
+                            className="bg-white w-full max-w-5xl max-h-[90vh] rounded-[3rem] overflow-hidden flex flex-col shadow-2xl relative"
                         >
                             <button
                                 onClick={() => setSelectedProperty(null)}
-                                className="absolute top-6 right-6 z-[110] p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white hover:text-black transition-all"
+                                className="absolute top-6 right-6 z-[110] p-3 bg-black/20 backdrop-blur-md rounded-full text-white hover:bg-white hover:text-black transition-all"
                             >
                                 <X size={20} />
                             </button>
 
-                            <div className="flex flex-col md:flex-row w-full overflow-y-auto">
+                            <div className="flex flex-col md:flex-row w-full h-full overflow-y-auto">
                                 <div className="w-full md:w-3/5 p-8">
                                     <PropertyCollage images={selectedProperty.gallery || [selectedProperty.image]} />
                                 </div>
 
-                                <div className="w-full md:w-2/5 p-8 md:p-12 flex flex-col bg-white">
+                                <div className="w-full md:w-2/5 p-8 md:p-12 flex flex-col bg-white overflow-y-auto">
                                     <span className="text-[#d4af37] font-black text-[10px] uppercase tracking-[0.3em] mb-4">Proyecto Destacado</span>
                                     <h2 className="text-[#1a1a1a] text-4xl font-black uppercase tracking-tighter leading-none mb-2">{selectedProperty.title}</h2>
                                     <p className="text-[#d4af37] text-lg font-bold mb-8">{selectedProperty.price}</p>
@@ -232,7 +247,8 @@ const PropertyExplorer = () => {
                                 </div>
                             </div>
                         </motion.div>
-                    </motion.div>
+                    </motion.div>,
+                    document.body
                 )}
             </AnimatePresence>
         </div>
