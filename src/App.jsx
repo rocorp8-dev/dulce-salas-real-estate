@@ -70,7 +70,7 @@ const LandingPage = () => (
           {/* Social Media Icons */}
           <div className="flex items-center justify-center gap-6 mt-12 mb-8">
             <a
-              href="https://www.instagram.com/dulce.ventas.encanto"
+              href="https://www.instagram.com/dulce.asesora_inmobiliaria"
               target="_blank"
               rel="noopener noreferrer"
               className="group relative"
