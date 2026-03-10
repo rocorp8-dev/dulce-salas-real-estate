@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAllServices, generateBudget, generateWhatsAppMessage } from './aiKnowledge';
 
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 /**
  * Detecta comandos especiales tipo slash (/)
@@ -51,11 +51,11 @@ export const listAllServices = () => {
  * Envía mensajes a la IA con lógica de reintentos y backoff exponencial
  */
 export const sendMessageToAI = async (messages, retries = 3, delay = 1000) => {
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
 
     if (!apiKey) {
         return {
-            error: "API Key de OpenRouter no configurada. Por favor, añade VITE_OPENROUTER_API_KEY a tu archivo .env"
+            error: "API Key de Groq no configurada. Por favor, añade VITE_GROQ_API_KEY a tu archivo .env"
         };
     }
 
@@ -65,9 +65,9 @@ export const sendMessageToAI = async (messages, retries = 3, delay = 1000) => {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
             const response = await axios.post(
-                OPENROUTER_URL,
+                GROQ_URL,
                 {
-                    model: 'google/gemini-2.0-flash-001',
+                    model: 'llama3-8b-8192',
                     messages: [
                         {
                             role: 'system',
@@ -92,8 +92,6 @@ Habla siempre en español con elegancia.`
                 {
                     headers: {
                         'Authorization': `Bearer ${apiKey}`,
-                        'HTTP-Referer': window.location.origin || 'https://dulce-salas-real-estate-obj5.vercel.app',
-                        'X-Title': 'Dulce Salas Real Estate App',
                         'Content-Type': 'application/json',
                     },
                     timeout: 20000 // 20 segundos de timeout
