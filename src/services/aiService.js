@@ -86,7 +86,7 @@ Habla siempre en español con elegancia.`
                         },
                         ...recentMessages
                     ],
-                    max_tokens: 500,
+                    max_tokens: 400,
                     temperature: 0.7,
                 },
                 {
