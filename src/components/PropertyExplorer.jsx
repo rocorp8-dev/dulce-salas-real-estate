@@ -175,9 +175,9 @@ const PropertyExplorer = () => {
                 )}
             </div>
 
-            {/* Detail Overlay — rendered in a Portal to avoid scroll-context issues */}
+            {/* Detail Overlay — fixed overlay at z-9999, body scroll locked via useEffect */}
             <AnimatePresence>
-                {selectedProperty && createPortal(
+                {selectedProperty && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -247,8 +247,7 @@ const PropertyExplorer = () => {
                                 </div>
                             </div>
                         </motion.div>
-                    </motion.div>,
-                    document.body
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>
