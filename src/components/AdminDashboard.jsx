@@ -26,6 +26,18 @@ const AdminDashboard = () => {
         fetchProperties()
     }, [])
 
+    // 🔒 Lock body scroll when modal form is open
+    useEffect(() => {
+        if (isFormOpen) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = ''
+        }
+        return () => {
+            document.body.style.overflow = ''
+        }
+    }, [isFormOpen])
+
     const fetchProperties = async () => {
         setLoading(true)
         const { data, error } = await supabase.from('properties').select('*').order('created_at', { ascending: false })
