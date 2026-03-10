@@ -104,61 +104,59 @@ const PropertyExplorer = () => {
                         <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm">No hay propiedades en esta categoría</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pb-12">
+                    <div className="bento-grid pb-12">
                         <AnimatePresence mode="popLayout">
-                            {filteredProperties.map((prop) => (
-                                <motion.div
-                                    key={prop.id}
-                                    layout
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-                                    className="bg-white rounded-[2rem] overflow-hidden flex flex-col shadow-2xl hover:shadow-[#d4af3715] transition-all duration-500 border border-[#ffffff05] group"
-                                >
-                                    {/* Image Container */}
-                                    <div className="relative h-64 overflow-hidden">
-                                        <img
-                                            src={prop.image}
-                                            alt={prop.title}
-                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                                        />
-                                        <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-[#1a1a1a] shadow-sm">
-                                            {prop.category}
-                                        </div>
-                                    </div>
+                            {filteredProperties.map((prop, index) => {
+                                // Logic to assign bento spans
+                                let bentoClass = "";
+                                if (index === 0) bentoClass = "bento-item-large";
+                                else if (index === 1) bentoClass = "bento-item-tall";
+                                else if (index === 5) bentoClass = "bento-item-wide";
 
-                                    {/* Content */}
-                                    <div className="p-8 flex flex-col flex-1 bg-white">
-                                        <h3 className="text-[#1a1a1a] font-black text-xl mb-1 leading-tight uppercase tracking-tight">{prop.title}</h3>
-                                        <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold uppercase mb-4 tracking-tighter">
-                                            <MapPin size={10} className="text-[#d4af37]" />
-                                            {prop.location}
-                                        </div>
+                                return (
+                                    <motion.div
+                                        key={prop.id}
+                                        layout
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                                        className={`glass-premium rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl hover:shadow-[#d4af3720] transition-all duration-500 border border-[#ffffff10] group ${bentoClass}`}
+                                    >
+                                        {/* Image Container */}
+                                        <div className={`relative ${bentoClass.includes('large') || bentoClass.includes('tall') ? 'h-full min-h-[300px]' : 'h-64'} overflow-hidden`}>
+                                            <img
+                                                src={prop.image}
+                                                alt={prop.title}
+                                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
 
-                                        <p className="text-zinc-500 text-xs leading-relaxed mb-8 flex-1">
-                                            {prop.description}
-                                        </p>
+                                            <div className="absolute top-6 left-6 bg-[#d4af37] px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-black shadow-lg">
+                                                {prop.category}
+                                            </div>
 
-                                        {/* Price */}
-                                        <div className="mb-6 pt-6 border-t border-zinc-100">
-                                            <span className="text-[10px] text-zinc-400 block uppercase font-bold tracking-widest mb-1">Precio de Venta</span>
-                                            <span className="text-2xl font-black text-[#1a1a1a] tracking-tighter">{prop.price}</span>
+                                            {/* Floating Info for Bento items */}
+                                            <div className="absolute bottom-6 left-6 right-6">
+                                                <h3 className="text-white font-black text-xl mb-1 leading-tight uppercase tracking-tight glow-text">{prop.title}</h3>
+                                                <div className="flex items-center gap-1.5 text-[#d4af37] text-[10px] font-bold uppercase tracking-tighter">
+                                                    <MapPin size={10} />
+                                                    {prop.location}
+                                                </div>
+                                                <div className="mt-4 flex items-center justify-between">
+                                                    <span className="text-xl font-black text-white tracking-tighter">{prop.price}</span>
+                                                    <button
+                                                        onClick={() => setSelectedProperty(prop)}
+                                                        className="p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-[#d4af37] hover:text-black transition-all"
+                                                    >
+                                                        <Info size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        {/* Buttons */}
-                                        <div className="mt-auto">
-                                            <button
-                                                onClick={() => setSelectedProperty(prop)}
-                                                className="w-full flex items-center justify-center gap-2 bg-[#1a1a1a] text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-[#d4af37] transition-all duration-300 shadow-lg shadow-zinc-200"
-                                            >
-                                                <Info size={14} />
-                                                Saber más
-                                            </button>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))}
+                                    </motion.div>
+                                );
+                            })}
                         </AnimatePresence>
                     </div>
                 )}

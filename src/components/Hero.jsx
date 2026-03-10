@@ -38,12 +38,14 @@ const Hero = () => {
                     </p>
 
                     <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-                        <a
+                        <motion.a
                             href="#properties"
-                            className="w-full md:w-auto bg-[#d4af37] text-black px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white hover:scale-105 transition-all shadow-2xl shadow-[#d4af3720]"
+                            whileHover={{ scale: 1.05, backgroundColor: "#ffffff" }}
+                            whileTap={{ scale: 0.95 }}
+                            className="w-full md:w-auto bg-[#d4af37] text-black px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs transition-all shadow-2xl shadow-[#d4af3720]"
                         >
                             Ver Portafolio
-                        </a>
+                        </motion.a>
                         <a
                             href="#about"
                             className="w-full md:w-auto bg-white/10 backdrop-blur-md text-white border border-white/20 px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-all"

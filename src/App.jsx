@@ -58,12 +58,14 @@ const LandingPage = () => (
       <section id="contact" className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-black uppercase tracking-tighter mb-12">¿Listo para dar el siguiente paso?</h2>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05, backgroundColor: "#ffffff" }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => window.dispatchEvent(new CustomEvent('openChat'))}
-            className="bg-[#d4af37] text-black px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white hover:scale-105 transition-all shadow-2xl shadow-[#d4af3720]"
+            className="bg-[#d4af37] text-black px-12 py-5 rounded-full font-black uppercase tracking-widest text-xs transition-all shadow-2xl shadow-[#d4af3720]"
           >
             AGENDAR UNA CITA
-          </button>
+          </motion.button>
 
           {/* Social Media Icons */}
           <div className="flex items-center justify-center gap-6 mt-12 mb-8">
