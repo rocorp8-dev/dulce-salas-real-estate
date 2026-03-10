@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MapPin, Info, X, CheckCircle2, AlertCircle, Building2 } from 'lucide-react'
 import { supabase } from '../services/supabaseClient'
